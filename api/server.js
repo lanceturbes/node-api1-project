@@ -68,5 +68,28 @@ server.delete("/api/users/:id", async (req, res) => {
     });
   }
 });
+server.put("/api/users/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, bio } = req.body;
+    const userToUpdate = await User.findById(id);
+    if (!userToUpdate) {
+      res.status(404).json({
+        message: "The user with the specified ID does not exist",
+      });
+    } else if (!name || !bio) {
+      res.status(400).json({
+        message: "Please provide name and bio for the user",
+      });
+    } else {
+      const updatedUser = await User.update(id, { name, bio });
+      res.status(200).json(updatedUser);
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: "The user information could not be modified",
+    });
+  }
+});
 
 module.exports = server;
